@@ -69,6 +69,9 @@ Feel free to open an issue on github or use the contact author on the SplunkBase
 Icons by Bing CoPilot
 
 ## Release Notes
+### 0.0.3
+Comments in code updated only
+
 ### 0.0.2
 Removed SHC check as app.conf is not replicated in an SHC by default, this should therefore run per-SH cluster member
 
