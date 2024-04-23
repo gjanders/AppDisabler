@@ -58,30 +58,6 @@ class AppDisabler(smi.Script):
         # Define the headers
         headers = {"Authorization": "Splunk " + self.service.token }
 
-        #Verify=false is hardcoded to workaround local SSL issues
-        shc_check_url = "https://localhost:8089/services/shcluster/captain/info?output_mode=json"
-        logger.debug(f"Attempting to call url={shc_check_url} headers={headers}")
-
-        try:
-            res = requests.get(shc_check_url, headers=headers, verify=True)
-        except requests.exceptions.SSLError:
-            logger.error(f"requests.get call to url={shc_check_url} failed due to SSLError, you may need to set verify=False")
-            return 
-
-        if (res.status_code == 503):
-            logger.debug("Non-shcluster / standalone instance, safe to run on this node")
-        elif (res.status_code != requests.codes.ok):
-            logger.fatal(f"Unable to determine if this is a search head cluster or not, this is a bug, shc_check_url={shc_check_url} status_code={res.status_code} reason={res.reason} response={res.text}")
-            return
-        elif (res.status_code == 200):
-            #We're in a search head cluster, but are we the captain?
-            json_dict = res.json()
-            if json_dict['origin'] != "https://localhost:8089/services/shcluster/captain/info":
-                logger.info("Not on the captain, exiting now")
-                return
-            else:
-                logger.info("On the captain node of an SHC, running")
- 
         for input_name, input_item in list(inputs.inputs.items()):
             # Get fields from the InputDefinition object
             app = input_item["app"]
@@ -105,7 +81,12 @@ class AppDisabler(smi.Script):
             logger.info(f"Check app={app} status")
 
             # Make the GET request
-            response = requests.get(app_url, headers=headers, verify=True)
+            try:
+                logger.debug(f"Attempting to call url={app_url} headers={headers}")
+                response = requests.get(app_url, headers=headers, verify=True)
+            except requests.exceptions.SSLError:
+                logger.error(f"requests.get call to url={app_url} failed due to SSLError, you may need to set verify=False")
+                return
 
             if response.status_code != 200:
                 logger.error(f"GET request failed with status_code={response.status_code} text={response.text}")
@@ -123,7 +104,7 @@ class AppDisabler(smi.Script):
                 return
             else:
                 # Make the POST request
-                response = requests.post(app_post, headers=headers, verify=False)
+                response = requests.post(app_post, headers=headers, verify=True)
                 if response.status_code != 200:
                     logger.error(f"POST request failed with status_code={response.status_code} text={response.text}")
                     return

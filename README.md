@@ -36,10 +36,18 @@ app_disabled = False
 interval = -1
 ```
 
-On a search head cluster the input will only run on the captain to avoid duplicated REST calls, otherwise the input will run on the requested interval
+Or perhaps you do not require the python readiness check:
+```
+[app_disabler://python_upgrade_readiness_app]
+app = python_upgrade_readiness_app
+interval = -1
+```
+
+Note that in my testing the splunk_assist app *cannot* be disabled by a REST-based call, however this should work for most applications
 
 ## Are there alternatives?
-In a search head cluster this is easily disabled via the UI, on a forwarder or indexer this is slightly more effort.
+In a search head cluster this is easily disabled via the UI, however using the UI of a search head cluster disables the app on a single member.
+To disable on all members you can login to each one, or use this app. It's similar with heavy forwarders or indexers...
 
 If this were a non-default Splunk app you could simply override the disabled flag via app.conf
 
@@ -61,5 +69,8 @@ Feel free to open an issue on github or use the contact author on the SplunkBase
 Icons by Bing CoPilot
 
 ## Release Notes
+### 0.0.2
+Removed SHC check as app.conf is not replicated in an SHC by default, this should therefore run per-SH cluster member
+
 ### 0.0.1
 Initial version
