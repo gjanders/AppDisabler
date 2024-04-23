@@ -105,8 +105,8 @@ class AppDisabler(smi.Script):
             else:
                 # Make the POST request
                 response = requests.post(app_post, headers=headers, verify=True)
-                # the code after this point will not be reached on a successful POST
-                # this is because disabling the application in question triggers a reload of the inputs.conf entries
+                # the code after this point will not be reached on a successful POST to an app with modular inputs
+                # this is because disabling the application in question can trigger a reload of the inputs handler
                 # and therefore this code will not be reached if the POST is successful as running inputs are stopped
                 # and then started again
                 if response.status_code != 200:
