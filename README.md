@@ -69,6 +69,9 @@ Feel free to open an issue on github or use the contact author on the [SplunkBas
 Icons by Bing CoPilot
 
 ## Release Notes
+### 0.0.3
+Updated splunk python SDK from 2.0.1 to 2.0.2 as per Splunk cloud compatability requirements
+
 ### 0.0.2
 Removed SHC check as app.conf is not replicated in an SHC by default, this should therefore run per-SH cluster member
 
