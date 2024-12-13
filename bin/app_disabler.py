@@ -32,6 +32,12 @@ class AppDisabler(smi.Script):
         app_name.required_on_create = True
         app_name.description = "Name of the app where the report exists"
 
+        app_debug = Argument("debug_mode")
+        app_debug.data_type = Argument.data_type_boolean
+        app_debug.required_on_edit = False
+        app_debug.required_on_create = False
+        app_debug.description = "Enables debug logging"
+
         return scheme
 
     def stream_events(self, inputs, ew):
@@ -59,6 +65,9 @@ class AppDisabler(smi.Script):
         headers = {"Authorization": "Splunk " + self.service.token }
 
         for input_name, input_item in list(inputs.inputs.items()):
+            # Set to INFO, we can change to DEBUG if required
+            logger.setLevel(logging.INFO)
+
             # Get fields from the InputDefinition object
             app = input_item["app"]
 
@@ -72,6 +81,10 @@ class AppDisabler(smi.Script):
             else:
                 endpoint = "enable"
 
+            if 'app_debug' in input_item:
+                if input_item['app_debug'] == "True":
+                    logger.setLevel(logging.DEBUG)
+
             # Define the URLs
             app_url = f"https://localhost:8089/services/apps/local/{app}?f=disabled&output_mode=json"
             app_post = f"https://localhost:8089/services/apps/local/{app}/{endpoint}"
@@ -83,7 +96,7 @@ class AppDisabler(smi.Script):
             # Make the GET request
             try:
                 logger.debug(f"Attempting to call url={app_url} headers={headers}")
-                response = requests.get(app_url, headers=headers, verify=True)
+                response = requests.get(app_url, headers=headers, verify=False)
             except requests.exceptions.SSLError:
                 logger.error(f"requests.get call to url={app_url} failed due to SSLError, you may need to set verify=False")
                 return
@@ -99,12 +112,17 @@ class AppDisabler(smi.Script):
             disabled = data['entry'][0]['content']['disabled']
             logger.debug(f"Disabled value is disabled={disabled}")
 
+            logger.error(f"disabled={disabled} {type(disabled)}")
             if disabled == True and app_disabled == "True":
                 logger.info(f"app={app} is already {endpoint}d")
                 return
             else:
                 # Make the POST request
-                response = requests.post(app_post, headers=headers, verify=True)
+                try:
+                    logger.debug(f"Attempting to call url={app_post} headers={headers}")
+                    response = requests.post(app_post, headers=headers, verify=False)
+                except:
+                    logger.error(f"requests.get call to url={app_url} failed due to SSLError, you may need to set verify=False")
                 if response.status_code != 200:
                     logger.error(f"POST request failed with status_code={response.status_code} text={response.text}")
                     return
