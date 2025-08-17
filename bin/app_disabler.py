@@ -25,18 +25,21 @@ class AppDisabler(smi.Script):
         app_disabled.required_on_edit = False
         app_disabled.required_on_create = False
         app_disabled.description = "Should the application be disabled or enabled (default True)"
+        scheme.add_argument(app_disabled)
 
         app_name = Argument("app")
         app_name.data_type = Argument.data_type_string
         app_name.required_on_edit = True
         app_name.required_on_create = True
         app_name.description = "Name of the app where the report exists"
+        scheme.add_argument(app_name)
 
         app_debug = Argument("debug_mode")
         app_debug.data_type = Argument.data_type_boolean
         app_debug.required_on_edit = False
         app_debug.required_on_create = False
         app_debug.description = "Enables debug logging"
+        scheme.add_argument(app_debug)
 
         return scheme
 

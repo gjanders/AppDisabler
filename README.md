@@ -69,6 +69,9 @@ Feel free to open an issue on github or use the contact author on the [SplunkBas
 Icons by Bing CoPilot
 
 ## Release Notes
+### 0.0.6
+Updated `app_disabler.py` to correctly use the schema (no functional changes, UI input will have correct description text now)
+
 ### 0.0.5
 Added debug option to enable debug logs
 
