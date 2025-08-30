@@ -69,6 +69,10 @@ Feel free to open an issue on github or use the contact author on the [SplunkBas
 Icons by Bing CoPilot
 
 ## Release Notes
+### 0.0.7
+Corrected inputs.conf.spec file to have `debug_mode`
+Removed inputs.conf entry for python_upgrade_readiness app this can be done via a `local/inputs.conf` file 
+
 ### 0.0.6
 Updated `app_disabler.py` to correctly use the schema (no functional changes, UI input will have correct description text now)
 
